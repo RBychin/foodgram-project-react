@@ -31,6 +31,7 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
+    'core.apps.CoreConfig',
     'api.apps.ApiConfig',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -40,7 +41,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework.authtoken',
-    'djoser'
+    'djoser',
+    'colorfield'
 ]
 
 MIDDLEWARE = [
@@ -149,3 +151,13 @@ DJOSER = {
         'user': ['rest_framework.permissions.IsAuthenticated'],  # Указывает права доступа к конкретному пользователю
     }
 }
+
+
+MAX_LENGTH = 100
+UNIT_CHOICE = (
+    ('шт', 'шт'),
+    ('г', 'г'),
+    ('мл', 'мл'),
+    ('ст. л.', 'ст. л.')
+)
+
