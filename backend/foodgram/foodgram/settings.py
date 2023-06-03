@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework.authtoken',
+    'django_filters',
     'djoser',
     'colorfield'
 ]
@@ -135,15 +136,16 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.TokenAuthentication',
-        'rest_framework.authentication.BasicAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.TokenAuthentication'
     ]
 }
 
 DJOSER = {
+    'HIDE_USERS': False,
     'SERIALIZERS': {
         'user_create': 'api.serializers.UserCreateSerializer',
+        'user': 'api.serializers.UserCustomSerializer',
+        'current_user': 'api.serializers.UserCustomSerializer',
     },
     'LOGIN_FIELD': 'email',
     'PERMISSIONS': {
@@ -152,8 +154,7 @@ DJOSER = {
     }
 }
 
-
-MAX_LENGTH = 100
+MAX_LENGTH = 100  # Длина имен
 UNIT_CHOICE = (
     ('шт', 'шт'),
     ('г', 'г'),

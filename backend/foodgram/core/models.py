@@ -10,7 +10,7 @@ User = get_user_model()
 
 class Tag(models.Model):
     name = models.CharField(
-        'Тег', max_length=100,
+        'Тег', max_length=settings.MAX_LENGTH,
         unique=True,
     )
     color = ColorField(format='hexa')
@@ -77,8 +77,12 @@ class Recipe(models.Model):
         'Время приготовления',
         validators=[MinValueValidator(1)]
     )
+    pub_date = models.DateTimeField(
+        verbose_name='Дата создания',
+        auto_now_add=True)
 
     class Meta:
+        ordering = ['-pub_date', ]
         verbose_name = 'рецепт'
         verbose_name_plural = 'рецепты'
 
@@ -97,6 +101,9 @@ class RecipeIngredient(models.Model):
     amount = models.PositiveSmallIntegerField(
         verbose_name='Количество'
     )
+
+    class Meta:
+        unique_together = ('recipe', 'ingredient')
 
     def __str__(self):
         return str(self.amount)

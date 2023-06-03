@@ -5,6 +5,7 @@ from core.models import Tag, Ingredient, Recipe, RecipeIngredient
 import base64
 from django.core.files.base import ContentFile
 from django.db.transaction import atomic
+from rest_framework.validators import UniqueTogetherValidator
 
 User = get_user_model()
 
@@ -18,10 +19,22 @@ class Base64ImageField(serializers.ImageField):
         return super().to_internal_value(data)
 
 
+class UserCustomSerializer(DUCreateSerializer):
+
+    class Meta:
+        model = User
+        fields = ('email', 'id', 'username', 'first_name', 'last_name')
+
+
 class UserCreateSerializer(DUCreateSerializer):
+    email = serializers.EmailField(max_length=254)
+    username = serializers.CharField(max_length=150)
+    first_name = serializers.CharField(max_length=150)
+    last_name = serializers.CharField(max_length=150)
+    password = serializers.CharField(max_length=150)
     class Meta(DUCreateSerializer.Meta):
         model = User
-        fields = '__all__'
+        fields = ('email', 'id', 'first_name', 'last_name', 'username', 'password')
         extra_kwargs = {'first_name': {'required': True},
                         'last_name': {'required': True},
                         'email': {'required': True}}
@@ -78,14 +91,25 @@ class RecipeIngredientSerializer(serializers.ModelSerializer):
 
 class RecipeSerializer(serializers.ModelSerializer):
     ingredients = RecipeIngredientSerializer(many=True, source='recipeingredient_set')
-    author = UserCreateSerializer(read_only=True)
+    author = UserCustomSerializer(read_only=True)
     image = Base64ImageField()
-    # При добавлении tags - из validated_data исчезает ключ 'tags'.
-    # tags = TagSerializer(many=True, read_only=True)
+    tags = serializers.ListSerializer(child=serializers.CharField())
 
     class Meta:
         model = Recipe
         fields = ('id', 'tags', 'author', 'ingredients', 'name', 'image', 'text', 'cooking_time')
+
+    def validate(self, attrs):
+        ingredients = self.initial_data.get('ingredients')
+        ingredient_list = []
+        for ingredient in ingredients:
+            id = ingredient.get('id')
+            if id in ingredient_list:
+                raise serializers.ValidationError({
+                    'errors': 'Проверьте добавленные ингредиенты.'
+                })
+            ingredient_list.append(id)
+        return attrs
 
     def create(self, validated_data):
         ingredients_data = validated_data.pop('recipeingredient_set')
@@ -98,3 +122,9 @@ class RecipeSerializer(serializers.ModelSerializer):
                                             ingredient=ingredient,
                                             amount=ingredient_data['amount'])
         return recipe
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        tags = TagSerializer(instance.tags.all(), many=True).data
+        data['tags'] = tags
+        return data
