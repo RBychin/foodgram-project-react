@@ -107,3 +107,35 @@ class RecipeIngredient(models.Model):
 
     def __str__(self):
         return str(self.amount)
+
+
+class Favorite(models.Model):
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE,
+        related_name='favorite'
+    )
+    recipe = models.ForeignKey(
+        Recipe, on_delete=models.CASCADE
+    )
+
+    class Meta:
+        unique_together = ('recipe', 'user')
+
+
+class Follow(models.Model):
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE,
+        related_name='follower'
+    )
+    following = models.ForeignKey(
+        User, on_delete=models.CASCADE,
+        related_name='following'
+    )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'following'],
+                name='unique_follow_user'
+            )
+        ]

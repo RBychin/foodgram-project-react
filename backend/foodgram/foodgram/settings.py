@@ -149,8 +149,8 @@ DJOSER = {
     },
     'LOGIN_FIELD': 'email',
     'PERMISSIONS': {
-        'user_list': ['rest_framework.permissions.IsAuthenticated'],  # Указывает права доступа к списку пользователей
-        'user': ['rest_framework.permissions.IsAuthenticated'],  # Указывает права доступа к конкретному пользователю
+        'user_list': ['rest_framework.permissions.AllowAny'],  # Указывает права доступа к списку пользователей
+        'user': ['rest_framework.permissions.AllowAny'],  # Указывает права доступа к конкретному пользователю
     }
 }
 
@@ -161,4 +161,4 @@ UNIT_CHOICE = (
     ('мл', 'мл'),
     ('ст. л.', 'ст. л.')
 )
-
+PAGE_SIZE = 6
