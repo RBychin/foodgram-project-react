@@ -4,12 +4,20 @@ from core.models import Recipe
 
 
 class RecipeFilter(filters.FilterSet):
-    tags = filters.AllValuesMultipleFilter(field_name='tags__slug')
-    # author = filters.
+    is_favorited = filters.BooleanFilter(
+        method='filter_is_favorited'
+    )
+
+    def filter_is_favorited(self, queryset, field, value):
+        if not value and self.request.user.is_annonymous:
+            return queryset
+        return queryset.filter(
+            favorites__user=self.request.user
+        )
 
     class Meta:
         model = Recipe
-        fields = ['tags', 'author']
+        fields = ['author']
 
 
 class IngredientSearchField(SearchFilter):

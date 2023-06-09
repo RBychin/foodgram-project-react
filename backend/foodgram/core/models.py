@@ -13,7 +13,9 @@ class Tag(models.Model):
         'Тег', max_length=settings.MAX_LENGTH,
         unique=True,
     )
-    color = ColorField(format='hexa')
+    color = ColorField(format='hexa',
+                       verbose_name='цвет',
+                       unique=True)
     slug = models.SlugField(
         'Slug', max_length=settings.MAX_LENGTH,
     )
@@ -33,8 +35,7 @@ class Ingredient(models.Model):
     )
     measurement_unit = models.CharField(
         'единица измерения',
-        max_length=settings.MAX_LENGTH,
-        choices=settings.UNIT_CHOICE
+        max_length=settings.MAX_LENGTH
     )
 
     class Meta:
@@ -47,7 +48,8 @@ class Ingredient(models.Model):
 
 class Recipe(models.Model):
     tags = models.ManyToManyField(
-        Tag, verbose_name='Тег'
+        Tag, verbose_name='Тег',
+        related_name='tags'
     )
     author = models.ForeignKey(
         User, verbose_name='Автор',
@@ -58,7 +60,6 @@ class Recipe(models.Model):
         Ingredient, through='RecipeIngredient',
         verbose_name='Ингредиенты'
     )
-    # is_favorited = ...
     # is_in_shopping_cart = ...
     name = models.CharField(
         'Название рецепта',
@@ -89,6 +90,9 @@ class Recipe(models.Model):
     def __str__(self):
         return self.name
 
+    def get_absolute_url(self):
+        return f'http://{settings.HOST}/recipes/{self.pk}'
+
 
 class RecipeIngredient(models.Model):
     recipe = models.ForeignKey(
@@ -115,11 +119,9 @@ class Favorite(models.Model):
         related_name='favorite'
     )
     recipe = models.ForeignKey(
-        Recipe, on_delete=models.CASCADE
+        Recipe, on_delete=models.CASCADE,
+        related_name='favorites'
     )
-
-    class Meta:
-        unique_together = ('recipe', 'user')
 
 
 class Follow(models.Model):
@@ -127,15 +129,22 @@ class Follow(models.Model):
         User, on_delete=models.CASCADE,
         related_name='follower'
     )
-    following = models.ForeignKey(
+    author = models.ForeignKey(
         User, on_delete=models.CASCADE,
         related_name='following'
     )
 
     class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=['user', 'following'],
-                name='unique_follow_user'
-            )
-        ]
+        ordering = ['user__id']
+        unique_together = ('user', 'author')
+
+
+class ShoppingCart(models.Model):
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE,
+        related_name='cart'
+    )
+    recipe = models.ForeignKey(
+        Recipe, on_delete=models.CASCADE,
+        related_name='recipe_in_cart'
+    )

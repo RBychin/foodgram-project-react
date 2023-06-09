@@ -1,43 +1,27 @@
 from django.contrib.auth.models import AbstractUser
-from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.db import models
-from django.db.models import F, Q
 
 
-class User(AbstractUser):
-    """ Кастомная модель пользователя. """
-
-    username_validator = UnicodeUsernameValidator()
-
+class CustomUser(AbstractUser):
     email = models.EmailField(
-        'Почта',
-        max_length=254,
-        unique=True
-    )
-    firs_name = models.CharField(
-        'Имя',
-        max_length=150,
-        blank=True
+        verbose_name='email',
+        unique=True,
+        blank=False,
+        null=False)
+    first_name = models.CharField(
+        verbose_name='Имя',
+        blank=False,
+        null=False
     )
     last_name = models.CharField(
-        'Фамилия',
-        max_length=150,
-        blank=True
+        verbose_name='Фамилия',
+        blank=False,
+        null=False
     )
-    username = models.CharField(
-        max_length=150,
-        unique=True,
-        validators=[username_validator],
-        verbose_name='Username'
-    )
-
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username', 'first_name', 'last_name']
 
     class Meta:
-        verbose_name = 'Пользователь'
-        verbose_name_plural = 'Пользователи'
-        ordering = ('id',)
+        verbose_name = 'пользователь'
+        verbose_name_plural = 'пользователи'
 
-    def __str__(self):
-        return self.username
+    def has_module_perms(self, app_label):
+        return self.is_staff

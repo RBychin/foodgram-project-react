@@ -5,6 +5,7 @@ import os
 from django.core.management.base import BaseCommand
 from django.db import DatabaseError, IntegrityError
 from core.models import Ingredient
+from foodgram.settings import BASE_DIR
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -13,19 +14,26 @@ sh.setLevel(logging.INFO)
 logger.addHandler(sh)
 
 
-FILE = os.path.join('/home/roman/PycharmProjects/Sprint_17_NEW/foodgram-project-react/data/ingredients.csv')
+FILE = os.path.join(
+    BASE_DIR.parent.parent,
+    'data/ingredients.csv'
+)
 
 
 def open_csv(file):
     try:
-        with open(FILE, 'r', encoding='utf-8') as r_file:
+        with open(FILE, 'r',
+                  encoding='utf-8') as r_file:
             reader = csv.DictReader(
                 r_file,
-                fieldnames=['name', 'measurement_unit'],
+                fieldnames=[
+                    'name',
+                    'measurement_unit'
+                ],
                 delimiter=',')
             create_obj(reader)
     except FileNotFoundError:
-        logger.error(f'Файл не найден.')
+        logger.error('Файл не найден.')
 
 
 def create_obj(reader):
@@ -40,7 +48,8 @@ def create_obj(reader):
     except DatabaseError as er:
         logger.error(f'Ошибка: {er}')
     else:
-        logger.info(f'Успех, добавлено {reader.line_num} записей.')
+        logger.info(f'Успех, добавлено '
+                    f'{reader.line_num} записей.')
 
 
 class Command(BaseCommand):
@@ -50,4 +59,5 @@ class Command(BaseCommand):
         try:
             open_csv(FILE)
         except TypeError:
-            logger.error(f'Ошибка, проверьте наличие файла по адресу {FILE}')
+            logger.error(f'Ошибка, проверьте '
+                         f'наличие файла по адресу {FILE}')
