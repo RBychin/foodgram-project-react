@@ -41,6 +41,10 @@ def get_model_object(model, data):
     )
 
 
+def get_filter_set(model, data):
+    return model.objects.filter(**data)
+
+
 class IngredientsView(ModelViewSet):
     """Представление для Ингредиентов"""
 
@@ -73,10 +77,8 @@ class RecipeView(ModelViewSet):
     def get_queryset(self):
         if 'tags' in self.request.GET:
             tags = self.request.GET.getlist('tags')
-            return Recipe.objects.filter(
-                tags__slug__in=tags
-            ).distinct()
-
+            data = {'tags__slug__in': tags}
+            return get_filter_set(Recipe, data).distinct()
         return self.queryset
 
     def perform_create(self, serializer):
@@ -91,7 +93,7 @@ class RecipeView(ModelViewSet):
             'user': self.request.user,
             'recipe': get_model_object(Recipe, kwargs)
         }
-        favorite = Favorite.objects.filter(**data)
+        favorite = get_filter_set(Favorite, data)
 
         if self.request.method == 'POST':
             if favorite.exists():

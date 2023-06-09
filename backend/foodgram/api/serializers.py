@@ -181,23 +181,6 @@ class RecipeSerializer(serializers.ModelSerializer):
         if request:
             return request.user
 
-    def create(self, validated_data):
-        ingredients_data = validated_data.pop('recipeingredient_set')
-        tags = validated_data.pop('tags')
-        recipe = Recipe.objects.create(**validated_data)
-        recipe.tags.set(tags)
-        self.create_ingredients(ingredients_data, recipe)
-        # for ingredient_data in ingredients_data:
-        #     ingredient = Ingredient.objects.get(
-        #         id=ingredient_data['ingredient']['id']
-        #     )
-        #     RecipeIngredient.objects.create(
-        #         recipe=recipe,
-        #         ingredient=ingredient,
-        #         amount=ingredient_data['amount']
-        #     )
-        return recipe
-
     def create_ingredients(self, ingredients, recipe):
         for ingredient in ingredients:
             RecipeIngredient.objects.create(
@@ -205,6 +188,14 @@ class RecipeSerializer(serializers.ModelSerializer):
                 ingredient_id=ingredient.get('ingredient').get('id'),
                 amount=ingredient.get('amount'),
             )
+
+    def create(self, validated_data):
+        ingredients_data = validated_data.pop('recipeingredient_set')
+        tags = validated_data.pop('tags')
+        recipe = Recipe.objects.create(**validated_data)
+        recipe.tags.set(tags)
+        self.create_ingredients(ingredients_data, recipe)
+        return recipe
 
     def get_is_favorited(self, obj):
         if self.get_user().is_anonymous:
