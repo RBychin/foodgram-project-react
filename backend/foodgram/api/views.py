@@ -61,7 +61,6 @@ class RecipeView(CustomModelViewSet):
     filter_backends = (DjangoFilterBackend,)
 
     def get_queryset(self):
-        """Выполняет фильтрацию по тегам."""
         if 'tags' in self.request.GET:
             tags = self.request.GET.getlist('tags')
             data = {'tags__slug__in': tags}
@@ -72,26 +71,19 @@ class RecipeView(CustomModelViewSet):
         serializer.validated_data['author'] = self.request.user
         serializer.save()
 
-    @action(methods=['POST', 'DELETE'],
-            detail=True,
-            url_path='favorite')
+    @action(methods=['POST', 'DELETE'], detail=True, url_path='favorite')
     def favorite(self, *args, **kwargs):
         return self.manage_subscription_favorite_cart(Favorite)
 
-    @action(methods=['POST', 'DELETE'],
-            detail=True,
-            url_path='shopping_cart')
+    @action(methods=['POST', 'DELETE'], detail=True, url_path='shopping_cart')
     def shopping_cart(self, *args, **kwargs):
         return self.manage_subscription_favorite_cart(ShoppingCart)
 
-    @action(methods=['GET'],
-            detail=False,
-            url_path='download_shopping_cart')
+    @action(methods=['GET'], detail=False, url_path='download_shopping_cart')
     def download_cart(self, *args, **kwargs):
         if not self.request.user.cart.all():
             raise ValidationError({'errors': 'Корзина пуста.'})
         content = pdf_dw(self.request)
         response = HttpResponse(content, content_type='text/plain')
         response['Content-Disposition'] = 'attachment; filename="list.txt"'
-
         return response

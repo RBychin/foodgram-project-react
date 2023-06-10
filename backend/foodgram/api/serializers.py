@@ -219,8 +219,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         if self.get_user().is_anonymous:
             return False
         if Favorite.objects.filter(
-                user=self.get_user(),
-                recipe=obj
+                user=self.get_user(),recipe=obj
         ).exists():
             return True
 
