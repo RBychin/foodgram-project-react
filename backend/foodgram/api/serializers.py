@@ -159,7 +159,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         ingredients = self.initial_data.get('ingredients')
         ingredient_list = []
         for ingredient in ingredients:
-            if ingredient in ingredient_list:
+            if ingredient.get('id') in ingredient_list:
                 raise serializers.ValidationError({
                     'errors': 'Проверьте добавленные ингредиенты.'
                 })
@@ -167,7 +167,7 @@ class RecipeSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError({
                     'errors': 'значение не может быть меньше 1.'
                 })
-            ingredient_list.append(ingredient)
+            ingredient_list.append(ingredient.get('id'))
 
         tags = self.initial_data.get('tags')
         if not tags:
@@ -197,6 +197,24 @@ class RecipeSerializer(serializers.ModelSerializer):
         self.create_ingredients(ingredients_data, recipe)
         return recipe
 
+    def update(self, instance, validated_data):
+        self.is_valid()
+        instance.image = validated_data.get('image', instance.image)
+        instance.name = validated_data.get('name', instance.name)
+        instance.text = validated_data.get('text', instance.text)
+        instance.cooking_time = validated_data.get(
+            'cooking_time', instance.cooking_time
+        )
+        instance.tags.clear()
+        instance.ingredients.clear()
+        tags_data = self.initial_data.get('tags')
+        instance.tags.set(tags_data)
+        RecipeIngredient.objects.filter(recipe=instance).all().delete()
+        ingredients_data = validated_data.pop('recipeingredient_set')
+        self.create_ingredients(ingredients_data, instance)
+        instance.save()
+        return instance
+
     def get_is_favorited(self, obj):
         if self.get_user().is_anonymous:
             return False
@@ -213,23 +231,6 @@ class RecipeSerializer(serializers.ModelSerializer):
             user=self.get_user(),
             recipe=obj
         ).exists()
-
-    def update(self, instance, validated_data):
-        instance.image = validated_data.get('image', instance.image)
-        instance.name = validated_data.get('name', instance.name)
-        instance.text = validated_data.get('text', instance.text)
-        instance.cooking_time = validated_data.get(
-            'cooking_time', instance.cooking_time
-        )
-        instance.tags.clear()
-        tags_data = self.initial_data.get('tags')
-        instance.tags.set(tags_data)
-        RecipeIngredient.objects.filter(recipe=instance).all().delete()
-        self.create_ingredients(
-            validated_data.get('recipeingredient_set'), instance
-        )
-        instance.save()
-        return instance
 
     def to_representation(self, instance):
         data = super().to_representation(instance)

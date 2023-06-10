@@ -8,6 +8,7 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
+from rest_framework.serializers import ValidationError
 
 from core.models import (Ingredient,
                          Tag,
@@ -74,7 +75,37 @@ class RecipeView(ModelViewSet):
     filterset_class = RecipeFilter
     filter_backends = (DjangoFilterBackend,)
 
+    def cart_favorite_add(self, data):
+        """Метод принимает словарь из моделей,
+        выполняет запись в БД и
+        возвращает сериализованные данные."""
+        relate = data.pop('relate')
+        query = get_filter_set(relate, data)
+        if query.exists():
+            raise ValidationError({'errors': 'Уже в избранном.'})
+        relate.objects.create(**data)
+        serializer = CropRecipeSerializer(
+            data.get('recipe'),
+            many=False,
+            context={'request': self.request}
+        )
+        return Response(serializer.data,
+                        status=HTTPStatus.CREATED)
+
+    def cart_favorite_del(self, data):
+        """Метод принимает словарь из моделей,
+        выполняет удаление из БД и
+        возвращает сериализованные данные."""
+        relate = data.pop('relate')
+        query = get_filter_set(relate, data)
+        if not query.exists():
+            raise ValidationError({'errors': 'У вас нет такого рецепта.'})
+        query.delete()
+        return Response({'detail': 'Удалено'},
+                        status=HTTPStatus.NO_CONTENT)
+
     def get_queryset(self):
+        """Выполняет фильтрацию по тегам."""
         if 'tags' in self.request.GET:
             tags = self.request.GET.getlist('tags')
             data = {'tags__slug__in': tags}
@@ -90,63 +121,39 @@ class RecipeView(ModelViewSet):
             url_path='favorite')
     def favorite(self, *args, **kwargs):
         data = {
+            'relate': Favorite,
             'user': self.request.user,
             'recipe': get_model_object(Recipe, kwargs)
         }
-        favorite = get_filter_set(Favorite, data)
-
         if self.request.method == 'POST':
-            if favorite.exists():
-                return Response({'errors': 'Уже в избранном.'},
-                                HTTPStatus.BAD_REQUEST)
-            Favorite.objects.create(**data)
-            serializer = CropRecipeSerializer(
-                data.get('recipe'),
-                many=False,
-                context={'request': self.request}
-            )
-            return Response(serializer.data,
-                            status=HTTPStatus.CREATED)
+            return self.cart_favorite_add(data)
 
         if self.request.method == 'DELETE':
-            if not favorite.exists():
-                return Response({'error': 'Нет такого'},
-                                status=HTTPStatus.BAD_REQUEST)
-            favorite.delete()
-            return Response({'detail': 'Удалено'},
-                            status=HTTPStatus.NO_CONTENT)
+            return self.cart_favorite_del(data)
 
     @action(methods=['POST', 'DELETE'],
             detail=True,
             url_path='shopping_cart')
     def shopping_cart(self, *args, **kwargs):
         data = {
+            'relate': ShoppingCart,
             'user': self.request.user,
             'recipe': get_model_object(Recipe, kwargs)
         }
-        cart = ShoppingCart.objects.filter(**data)
-
         if self.request.method == 'POST':
-            if cart.exists():
-                return Response(HTTPStatus.BAD_REQUEST)
-            ShoppingCart.objects.create(**data)
-            return Response({'detail': 'OK'},
-                            status=HTTPStatus.CREATED)
+            return self.cart_favorite_add(data)
 
         if self.request.method == 'DELETE':
-            if not cart.exists():
-                return Response({'error': 'такого нету'},
-                                status=HTTPStatus.BAD_REQUEST)
-            cart.delete()
-            return Response({'detail': 'Удаляем'},
-                            status=HTTPStatus.NO_CONTENT)
+            return self.cart_favorite_del(data)
 
     @action(methods=['GET'],
             detail=False,
             url_path='download_shopping_cart')
     def download_cart(self, *args, **kwargs):
+        if not self.request.user.cart.all():
+            raise ValidationError({'errors': 'Корзина пуста.'})
         content = pdf_dw(self.request)
         response = HttpResponse(content, content_type='text/plain')
-        response['Content-Disposition'] = 'attachment; filename=f"list.txt"'
+        response['Content-Disposition'] = 'attachment; filename="list.txt"'
 
         return response
