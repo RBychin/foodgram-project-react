@@ -82,7 +82,7 @@ class RecipeView(ModelViewSet):
         relate = data.pop('relate')
         query = get_filter_set(relate, data)
         if query.exists():
-            raise ValidationError({'errors': 'Уже в избранном.'})
+            raise ValidationError({'errors': 'Объект уже существует.'})
         relate.objects.create(**data)
         serializer = CropRecipeSerializer(
             data.get('recipe'),
@@ -99,7 +99,7 @@ class RecipeView(ModelViewSet):
         relate = data.pop('relate')
         query = get_filter_set(relate, data)
         if not query.exists():
-            raise ValidationError({'errors': 'У вас нет такого рецепта.'})
+            raise ValidationError({'errors': 'Объект не найден.'})
         query.delete()
         return Response({'detail': 'Удалено'},
                         status=HTTPStatus.NO_CONTENT)
