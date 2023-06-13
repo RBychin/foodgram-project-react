@@ -13,7 +13,6 @@ from core.models import (
     Ingredient,
     Recipe,
     RecipeIngredient,
-    Follow,
     Favorite,
     ShoppingCart
 )
