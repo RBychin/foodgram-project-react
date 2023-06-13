@@ -1,4 +1,3 @@
-import inspect
 from http import HTTPStatus
 
 from django.shortcuts import get_object_or_404
@@ -11,47 +10,39 @@ from api.serializers import CropRecipeSerializer
 
 class CustomModelViewSet(ModelViewSet):
 
-    def get_model_object(self, data):
+    def get_model_object(self):
         """Получает объект модели или возвращает ошибку 404"""
         return get_object_or_404(
-            self.queryset.model, **data
+            self.queryset.model, **(self.kwargs)
         )
 
     def get_filter_set(self, model, data):
         """Получает Модель и словарь для фильтрации."""
         return model.objects.filter(**data)
 
-    def manage_subscription_favorite_cart(self, relate_model):
+    def manage_favorite_cart(self, relate_model):
         """Управление записями о подписках, корзине и избранном,
         на входе функция получает объект класса и
         имя промежуточной модели для записи,
         обрабатывает POST и DELETE запросы,
         возвращая сериализованные данные."""
-        data = {'user': self.request.user}
-        if str(inspect.currentframe().f_back.f_code.co_name) == 'subscribe':
-            data['author'] = self.get_model_object(
-                {'pk': self.kwargs.get('id')}
-            )
-        else:
-            data['recipe'] = self.get_model_object(self.request.data)
-
+        user = self.request.user
+        obj = self.get_model_object()
+        data = {'user': user, 'recipe': obj}
+        query = relate_model.objects.filter(user=user, recipe=obj)
         if self.request.method == 'POST':
-            query = self.get_filter_set(relate_model, data)
             if query.exists():
                 raise ValidationError({'errors': 'Объект уже существует.'})
             relate_model.objects.create(**data)
             serializer = CropRecipeSerializer(
-                data.get('recipe'),
-                many=False,
+                instance=obj,
                 context={'request': self.request}
             )
-            return Response(serializer.data,
-                            status=HTTPStatus.CREATED)
+            return Response(serializer.data, status=HTTPStatus.CREATED)
 
         if self.request.method == 'DELETE':
-            query = self.get_filter_set(relate_model, data)
             if not query.exists():
                 raise ValidationError({'errors': 'Объект не найден.'})
             query.delete()
-            return Response({'detail': 'Удалено'},
+            return Response({'detail': 'Done'},
                             status=HTTPStatus.NO_CONTENT)

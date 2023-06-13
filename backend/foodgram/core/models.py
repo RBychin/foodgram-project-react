@@ -2,6 +2,7 @@ from colorfield.fields import ColorField
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.core.validators import MinValueValidator
+from django.db.models.constraints import UniqueConstraint
 
 from foodgram import settings
 
@@ -18,6 +19,7 @@ class Tag(models.Model):
                        unique=True)
     slug = models.SlugField(
         'Slug', max_length=settings.MAX_LENGTH,
+        unique=True
     )
 
     class Meta:
@@ -60,11 +62,9 @@ class Recipe(models.Model):
         Ingredient, through='RecipeIngredient',
         verbose_name='Ингредиенты'
     )
-    # is_in_shopping_cart = ...
     name = models.CharField(
         'Название рецепта',
         max_length=settings.MAX_LENGTH
-
     )
     image = models.ImageField(
         'Фото блюда',
@@ -103,11 +103,13 @@ class RecipeIngredient(models.Model):
         verbose_name='Ингредиент'
     )
     amount = models.PositiveSmallIntegerField(
-        verbose_name='Количество'
+        verbose_name='Количество',
+        validators=[MinValueValidator(1, message='не может быть меньше 1')]
     )
 
     class Meta:
-        unique_together = ('recipe', 'ingredient')
+        UniqueConstraint(fields=['recipe', 'ingredient'],
+                         name='unique_ingredient')
 
     def __str__(self):
         return str(self.amount)
@@ -123,6 +125,9 @@ class Favorite(models.Model):
         related_name='favorites'
     )
 
+    class Meta:
+        UniqueConstraint(fields=['user', 'recipe'], name='unique_favorites')
+
 
 class Follow(models.Model):
     user = models.ForeignKey(
@@ -136,7 +141,7 @@ class Follow(models.Model):
 
     class Meta:
         ordering = ['user__id']
-        unique_together = ('user', 'author')
+        UniqueConstraint(fields=['user', 'author'], name='unique_follow')
 
 
 class ShoppingCart(models.Model):
@@ -148,3 +153,6 @@ class ShoppingCart(models.Model):
         Recipe, on_delete=models.CASCADE,
         related_name='recipe_in_cart'
     )
+
+    class Meta:
+        UniqueConstraint(fields=['user', 'recipe'], name='unique_cart')

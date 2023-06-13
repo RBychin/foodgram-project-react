@@ -1,12 +1,15 @@
+from http import HTTPStatus
+
 from django.contrib.auth import get_user_model
 from djoser.views import UserViewSet
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.response import Response
+from rest_framework.serializers import ValidationError
 
 from api.paginators import PageLimitPagination
 from api.serializers import FollowSerializer, UserCustomSerializer
 from core.helpers import CustomModelViewSet
-from core.models import Follow
 
 User = get_user_model()
 
@@ -21,10 +24,8 @@ class UsersViewSet(UserViewSet, CustomModelViewSet):
 
     @action(methods=['get'], detail=False, url_path='subscriptions')
     def subscriptions(self, *args, **kwargs):
-        pagination = self.paginate_queryset(
-            self.get_filter_set(Follow,
-                                {'user': self.request.user})
-        )
+        queryset = self.request.user.follower.all()
+        pagination = self.paginate_queryset(queryset)
         serializer = FollowSerializer(
             pagination,
             many=True,
@@ -34,4 +35,20 @@ class UsersViewSet(UserViewSet, CustomModelViewSet):
 
     @action(methods=['post', 'delete'], detail=True, url_path='subscribe')
     def subscribe(self, *args, **kwargs):
-        return self.manage_subscription_favorite_cart(Follow)
+        user = self.request.user
+        author = User.objects.get(pk=self.kwargs.get('id'))
+        obj = user.follower.filter(author=author)
+        if self.request.method == 'POST':
+
+            if obj.exists():
+                raise ValidationError({'errors': 'Уже подписан.'})
+            user.follower.create(author=author)
+            serializer = FollowSerializer(
+                instance=author,
+                context={'request': self.request}
+            )
+            return Response(serializer.data)
+
+        if self.request.method == 'DELETE':
+            obj.delete()
+            return Response({'detail': 'Done'}, status=HTTPStatus.NO_CONTENT)

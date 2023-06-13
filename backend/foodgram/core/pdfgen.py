@@ -13,8 +13,8 @@ def pdf_dw(request):
     ).values('ingredient__name', 'ingredient__measurement_unit').annotate(
         total_amount=Sum('amount')
     )
-    total_cooking_time = Recipe.objects.aggregate(
-        total_cooking_time=Sum('cooking_time')
+    total_cooking_time = user.cart.all().aggregate(
+        total_cooking_time=Sum('recipe__cooking_time')
     )
 
     total_time = total_cooking_time['total_cooking_time']

@@ -5,19 +5,33 @@ from core.models import Recipe
 
 class RecipeFilter(filters.FilterSet):
     is_favorited = filters.BooleanFilter(
-        method='filter_is_favorited'
+        method='filter_cart_favorite'
     )
+    is_in_shopping_cart = filters.BooleanFilter(
+        method='filter_cart_favorite'
+    )
+    tags = filters.Filter(method='filter_tags')
 
-    def filter_is_favorited(self, queryset, field, value):
-        if not value and self.request.user.is_annonymous:
-            return queryset
-        return queryset.filter(
-            favorites__user=self.request.user
-        )
+    def filter_cart_favorite(self, queryset, field, value):
+        field_map = {'is_in_shopping_cart': 'recipe_in_cart__user',
+                     'is_favorited': 'favorites__user'}
+        if field:
+            if value:
+                return queryset.filter(**{
+                    field_map.get(field): self.request.user}
+                                       )
+        return queryset
+
+    def filter_tags(self, queryset, field, value):
+        tags = self.request.GET.getlist('tags')
+        return queryset.filter(tags__slug__in=tags).distinct()
 
     class Meta:
         model = Recipe
-        fields = ['author']
+        fields = ['author',
+                  'is_favorited',
+                  'is_in_shopping_cart',
+                  'tags']
 
 
 class IngredientSearchField(SearchFilter):
