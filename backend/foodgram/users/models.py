@@ -22,6 +22,7 @@ class CustomUser(AbstractUser):
     class Meta:
         verbose_name = 'пользователь'
         verbose_name_plural = 'пользователи'
+        ordering = ['id']
 
     def has_module_perms(self, app_label):
         return self.is_staff

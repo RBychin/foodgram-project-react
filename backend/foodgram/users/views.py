@@ -24,7 +24,8 @@ class UsersViewSet(UserViewSet, CustomModelViewSet):
 
     @action(methods=['get'], detail=False, url_path='subscriptions')
     def subscriptions(self, *args, **kwargs):
-        queryset = self.request.user.follower.all()
+        user = self.request.user
+        queryset = User.objects.filter(follower__user=user)
         pagination = self.paginate_queryset(queryset)
         serializer = FollowSerializer(
             pagination,
