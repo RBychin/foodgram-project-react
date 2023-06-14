@@ -10,12 +10,6 @@ from api.serializers import CropRecipeSerializer
 
 class CustomModelViewSet(ModelViewSet):
 
-    def get_model_object(self):
-        """Получает объект модели или возвращает ошибку 404"""
-        return get_object_or_404(
-            self.queryset.model, **(self.kwargs)
-        )
-
     def get_filter_set(self, model, data):
         """Получает Модель и словарь для фильтрации."""
         return model.objects.filter(**data)
@@ -27,7 +21,7 @@ class CustomModelViewSet(ModelViewSet):
         обрабатывает POST и DELETE запросы,
         возвращая сериализованные данные."""
         user = self.request.user
-        obj = self.get_model_object()
+        obj = self.get_object()
         data = {'user': user, 'recipe': obj}
         query = relate_model.objects.filter(user=user, recipe=obj)
         if self.request.method == 'POST':

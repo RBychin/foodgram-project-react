@@ -2,7 +2,8 @@ from django.contrib.auth import get_user_model
 from django.http import HttpResponse
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, \
+    IsAuthenticated
 from rest_framework.serializers import ValidationError
 from rest_framework.viewsets import ReadOnlyModelViewSet
 
@@ -57,9 +58,9 @@ class RecipeView(CustomModelViewSet):
     filter_backends = (DjangoFilterBackend,)
 
     def get_serializer_class(self):
-        if self.action in ['partial_update', 'POST']:
-            return RecipeWriteSerializer
-        return RecipeReadSerializer
+        if self.action == 'GET':
+            return RecipeReadSerializer
+        return RecipeWriteSerializer
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
@@ -68,7 +69,8 @@ class RecipeView(CustomModelViewSet):
     def favorite(self, request, *args, **kwargs):
         return self.manage_favorite_cart(Favorite)
 
-    @action(methods=['POST', 'DELETE'], detail=True, url_path='shopping_cart')
+    @action(methods=['POST', 'DELETE'], detail=True, url_path='shopping_cart',
+            permission_classes=[IsAuthenticated])
     def shopping_cart(self, *args, **kwargs):
         return self.manage_favorite_cart(ShoppingCart)
 

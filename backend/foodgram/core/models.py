@@ -126,7 +126,10 @@ class Favorite(models.Model):
     )
 
     class Meta:
-        UniqueConstraint(fields=['user', 'recipe'], name='unique_favorites')
+        constraints = [
+            models.UniqueConstraint(fields=['user', 'recipe'],
+                                    name='unique_favorites')
+        ]
 
 
 class Follow(models.Model):
@@ -141,7 +144,10 @@ class Follow(models.Model):
 
     class Meta:
         ordering = ['user__id']
-        UniqueConstraint(fields=['user', 'author'], name='unique_follow')
+        constraints = [
+            UniqueConstraint(fields=['user', 'author'],
+                             name='unique_follow')
+        ]
 
 
 class ShoppingCart(models.Model):
@@ -155,4 +161,7 @@ class ShoppingCart(models.Model):
     )
 
     class Meta:
-        UniqueConstraint(fields=['user', 'recipe'], name='unique_cart')
+        constraints = [
+            UniqueConstraint(fields=['user', 'recipe'],
+                             name='unique_cart')
+        ]

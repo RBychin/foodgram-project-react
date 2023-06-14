@@ -1,6 +1,6 @@
 from django_filters import rest_framework as filters
 from rest_framework.filters import SearchFilter
-from core.models import Recipe
+from core.models import Recipe, Tag
 
 
 class RecipeFilter(filters.FilterSet):
@@ -10,7 +10,11 @@ class RecipeFilter(filters.FilterSet):
     is_in_shopping_cart = filters.BooleanFilter(
         method='filter_cart_favorite'
     )
-    tags = filters.Filter(method='filter_tags')
+    tags = filters.ModelMultipleChoiceFilter(
+        field_name='tags__slug',
+        to_field_name='slug',
+        queryset=Tag.objects.all()
+    )
 
     def filter_cart_favorite(self, queryset, field, value):
         field_map = {'is_in_shopping_cart': 'recipe_in_cart__user',
@@ -21,10 +25,6 @@ class RecipeFilter(filters.FilterSet):
                     field_map.get(field): self.request.user}
                                        )
         return queryset
-
-    def filter_tags(self, queryset, field, value):
-        tags = self.request.GET.getlist('tags')
-        return queryset.filter(tags__slug__in=tags).distinct()
 
     class Meta:
         model = Recipe
