@@ -56,3 +56,10 @@ jobs:
         push: true
         context: backend/
         tags: rbychin/foodgram_backend:latest
+
+    - name: Push fronend to docker
+      uses: docker/build-push-action@v2
+      with:
+        push: true
+        context: frontend/
+        tags: rbychin/foodgram_frontend:latest
