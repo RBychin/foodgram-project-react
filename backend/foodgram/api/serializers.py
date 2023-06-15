@@ -41,8 +41,8 @@ class UserCustomSerializer(UserSerializer):
 
     def get_is_subscribed(self, obj):
         user = self.context.get('request').user
-        return user.follower.filter(author=obj
-                                    ).exists()
+        return user.is_authenticated and user.follower.filter(author=obj
+                                                              ).exists()
 
 
 class UserCreateSerializer(DUCreateSerializer):
