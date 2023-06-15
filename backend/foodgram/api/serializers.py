@@ -64,6 +64,14 @@ class UserCreateSerializer(DUCreateSerializer):
                         'email': {'required': True}}
 
 
+class IngredientWriteSerializer(serializers.ModelSerializer):
+    id = serializers.PrimaryKeyRelatedField(queryset=Ingredient.objects.all())
+
+    class Meta:
+        model = RecipeIngredient
+        fields = ('id', 'amount')
+
+
 class IngredientSerializer(serializers.ModelSerializer):
     """Сериализатор объекта модели Ингредиенты."""
 
@@ -150,7 +158,7 @@ class RecipeReadSerializer(serializers.ModelSerializer):
 class RecipeWriteSerializer(serializers.ModelSerializer):
     """Запись рецептов."""
     image = Base64ImageField()
-    ingredients = RecipeIngredientSerializer(many=True)
+    ingredients = IngredientWriteSerializer(many=True)
 
     class Meta:
         model = Recipe
@@ -179,7 +187,7 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
         objects = [
             RecipeIngredient(
                 recipe=recipe,
-                ingredient_id=ingredient.get('ingredient').get('id'),
+                ingredient=ingredient.get('id'),
                 amount=ingredient.get('amount')
             )
             for ingredient in ingredients
