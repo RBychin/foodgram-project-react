@@ -1,5 +1,6 @@
 from django_filters import rest_framework as filters
 from rest_framework.filters import SearchFilter
+
 from core.models import Recipe, Tag
 
 
@@ -21,9 +22,9 @@ class RecipeFilter(filters.FilterSet):
                      'is_favorited': 'favorites__user'}
         if field:
             if value:
-                return queryset.filter(**{
-                    field_map.get(field): self.request.user}
-                                       )
+                return queryset.filter(
+                    **{field_map.get(field): self.request.user}
+                )
         return queryset
 
     class Meta:

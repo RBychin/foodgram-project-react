@@ -23,10 +23,11 @@ def pdf_dw(request):
 
     content = ((f'Список покупок для пользователя '
                 f'{user.first_name} {user.last_name}\n'
-               f'Покупки для рецептов:') + '\n - ' +
+               f'Покупки для рецептов:') + '\n - '
                "\n - ".join(
                    [recipe.recipe.name for recipe in user.cart.all()]
-               ) + '\n\n')
+               )
+               + '\n\n')
     for ingredient in ingredient_counts:
         name = ingredient['ingredient__name']
         amount = ingredient['total_amount']

@@ -4,6 +4,7 @@ import os
 
 from django.core.management.base import BaseCommand
 from django.db import DatabaseError, IntegrityError
+
 from core.models import Ingredient
 from foodgram.settings import BASE_DIR
 
