@@ -1,15 +1,14 @@
 from http import HTTPStatus
 
+from api.paginators import PageLimitPagination
+from api.serializers import FollowSerializer, UserCustomSerializer
+from core.helpers import CustomModelViewSet
 from django.contrib.auth import get_user_model
 from djoser.views import UserViewSet
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
-
-from api.paginators import PageLimitPagination
-from api.serializers import FollowSerializer, UserCustomSerializer
-from core.helpers import CustomModelViewSet
 
 User = get_user_model()
 

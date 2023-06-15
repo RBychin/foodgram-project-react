@@ -1,10 +1,9 @@
 from http import HTTPStatus
 
+from api.serializers import CropRecipeSerializer
 from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
 from rest_framework.viewsets import ModelViewSet
-
-from api.serializers import CropRecipeSerializer
 
 
 class CustomModelViewSet(ModelViewSet):

@@ -1,6 +1,5 @@
-from django.db.models import Sum
-
 from core.models import RecipeIngredient
+from django.db.models import Sum
 
 
 def pdf_dw(request):
