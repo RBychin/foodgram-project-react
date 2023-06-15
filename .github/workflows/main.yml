@@ -51,7 +51,7 @@ jobs:
         password: LEfbV7gl8x
 
     - name: Push backend to docker
-      uses: docker/build-push-action@v2
+      uses: docker/backend/build-push-action@v2
       with:
         push: true
         tags: rbychin/foodgram_backend:latest
