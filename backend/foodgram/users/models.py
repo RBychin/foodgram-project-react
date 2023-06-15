@@ -10,11 +10,13 @@ class CustomUser(AbstractUser):
         null=False)
     first_name = models.CharField(
         verbose_name='Имя',
+        max_length=100,
         blank=False,
         null=False
     )
     last_name = models.CharField(
         verbose_name='Фамилия',
+        max_length=100,
         blank=False,
         null=False
     )

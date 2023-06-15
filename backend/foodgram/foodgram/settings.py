@@ -13,7 +13,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv()
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'default'
+SECRET_KEY = '!cyw3_os43*14*glhw6gvlnmza!le9sb%2c_6!nfz3486h!j&f'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -117,6 +117,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATIC_URL = 'static/'
 
 # Default primary key field type
@@ -149,7 +150,7 @@ DJOSER = {
 MAX_LENGTH = 100  # Длина имен
 
 AUTH_USER_MODEL = 'users.CustomUser'
-
+CSRF_TRUSTED_ORIGINS = ['http://*.mydomain.com', 'http://*.127.0.0.1', 'http://localhost']
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 

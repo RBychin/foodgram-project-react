@@ -15,7 +15,7 @@ logger.addHandler(sh)
 
 
 FILE = os.path.join(
-    BASE_DIR.parent.parent,
+    BASE_DIR,
     'data/ingredients.csv'
 )
 
@@ -33,7 +33,7 @@ def open_csv(file):
                 delimiter=',')
             create_obj(reader)
     except FileNotFoundError:
-        logger.error('Файл не найден.')
+        logger.error(f'Файл не найден. {FILE}')
 
 
 def create_obj(reader):
