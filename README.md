@@ -10,6 +10,8 @@
   `chief`
 - Admin password: \
   `admin`
+- Users passwords: \
+  `Ghfrnbrev23` (`Практикум23`)
 
 ### - Описание проекта:
 - Foodgram - сайт, для обмена рецептами.
