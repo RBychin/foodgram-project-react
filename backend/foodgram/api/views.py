@@ -12,6 +12,7 @@ from rest_framework.viewsets import ReadOnlyModelViewSet
 
 from .filters import IngredientSearchField, RecipeFilter
 from .paginators import PageLimitPagination
+from .permissions import IsOwnerOrReadOnly
 from .serializers import (IngredientSerializer, RecipeReadSerializer,
                           RecipeWriteSerializer, TagSerializer)
 
@@ -40,7 +41,7 @@ class RecipeView(CustomModelViewSet):
 
     queryset = Recipe.objects.all()
     pagination_class = PageLimitPagination
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
     filterset_class = RecipeFilter
     filter_backends = (DjangoFilterBackend,)
 
