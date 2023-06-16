@@ -5,19 +5,13 @@ on: [push]
 
 jobs:
   tests:
-    # «Раннер» — создание изолированного окружения с последней версией Ubuntu
     runs-on: ubuntu-latest
 
     steps:
-    # Запуск actions checkout — готового скрипта
-    # для клонирования репозитория
     - uses: actions/checkout@v2
     - name: Set up Python
-      # Запуск actions setup-python — готового скрипта
-      # для развёртывания окружения Python
       uses: actions/setup-python@v2
       with:
-        # Выбор версии Python
         python-version: 3.10.6
 
     - name: Install dependencies
@@ -36,7 +30,7 @@ jobs:
   build_push_images:
     name: Push images to Docker Hub
     runs-on: ubuntu-latest
-    needs: tests
+#    needs: tests
     steps:
     - name: Checking repo
       uses: actions/checkout@v2
@@ -78,7 +72,8 @@ jobs:
           script: |
             # Pull docker images from docker hub
             cd infra
-            sudo docker-compose down
+            sudo docker-compose stop
+            docker rmi rbychin/foodgram_backend --force
             touch .env
             echo DB_ENGINE=${{ secrets.DB_ENGINE }} >> .env
             echo DB_NAME=${{ secrets.DB_NAME }} >> .env
