@@ -3,6 +3,13 @@
 
 ![example workflow](https://github.com/RBychin/yamdb_final/actions/workflows/yamdb_workflow.yml/badge.svg)
 
+Для ревью:
+- Адрес сайта: \
+  http://rbychin.ddns.net
+- Admin name: \
+  `chief`
+- Admin password: \
+  `admin`
 
 ### - Описание проекта:
 - Foodgram - сайт, для обмена рецептами.
@@ -27,7 +34,7 @@
 - Скачайте папки `infra` и `data` из корневой директории проекта.
 - Разместите эти папки на своем сервере.
 - В директории `infra` создайте файл `.env` \
-  со следующими данными:
+  со следующими полями:
   - `HOST=<http://rbychin.ddns.net> адрес хоста`
   - `DB_ENGINE=django.db.backends.postgresql`
   - `DB_NAME=<Имя базы>`
@@ -36,4 +43,29 @@
   - `DB_HOST=infra_db_1`
   - `DB_PORT=5432`
 
-- docker-compose exec backend bash
+- перейдите в директорию `infra`: `cd infra`.
+- запустите docker-compose файл `docker-compose up -d`
+- После завершения запуска, выполните миграции и сбор статики:
+  - `docker-compose exec backend python manage.py collectstatic`
+  - `docker-compose exec backend python manage.py makemigrations`
+  - `docker-compose exec backend python manage.py migrate`
+  - `docker-compose exec backend python manage.py load_data`
+
+- Ваш сервер запущен и готов к работе по адресу вашего сервера на порту 80.
+
+
+### - Админка:
+Приложение имеет возможность назначать администраторов.\
+Администратор может:
+- Добавлять, удалять, изменять рецепты.
+- Добавлять, удалять, изменять теги.
+- Добавлять, удалять, изменять ингредиенты.
+- Добавлять, удалять, изменять, блокировать пользователей (кроме суперюзера).
+- Назначать администраторов может только суперпользователь.
+  - что бы назначить пользователя Администратором, необходимо установить на странице пользователя "Администратор" и дать пользователю необходимые права, либо добавить в зарание созданную группу.
+
+
+Для создания суперпользователя выполните команду:
+- `docker-compose exec backend python manage.py createsuperuser`
+
+Для доступа в админ панель используйте url такого вида `http://your_host/admin/`.
