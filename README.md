@@ -7,7 +7,7 @@
 - Адрес сайта: \
   http://rbychin.ddns.net
 - Admin name: \
-  `chief`
+  `admin`
 - Admin password: \
   `admin`
 - Users passwords: \
