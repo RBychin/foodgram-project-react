@@ -75,8 +75,7 @@ jobs:
           script: |
             # Pull docker images from docker hub
             cd infra
-            sudo docker-compose stop
-            sudo docker rmi rbychin/foodgram_backend --force
+            sudo docker-compose down
             touch .env
             echo DB_ENGINE=${{ secrets.DB_ENGINE }} >> .env
             echo DB_NAME=${{ secrets.DB_NAME }} >> .env
