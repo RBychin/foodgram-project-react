@@ -68,6 +68,7 @@ jobs:
             # Pull docker images from docker hub
             cd infra
             sudo docker-compose down
+            sudo docker rmi rbychin/foodgram_backend
             rm .env
             touch .env
             echo HOST=${{ secrets.HOST }} >> .env
