@@ -20,13 +20,15 @@ def pdf_dw(request):
     hours = total_time // 60
     minutes = total_time % 60
 
-    content = ((f'Список покупок для пользователя '
-                f'{user.first_name} {user.last_name}\n'
-               f'Покупки для рецептов:') + '\n - '
-               "\n - ".join(
-                   [recipe.recipe.name for recipe in user.cart.all()]
-               )
-               + '\n\n')
+    content = (
+        f'Список покупок для пользователя '
+        f'{user.first_name} {user.last_name}\n'
+        f'Покупки для рецептов:'
+        '\n - ', "\n - ".join([recipe.recipe.name for
+                               recipe in user.cart.all()])
+        + '\n\n'
+    )
+
     for ingredient in ingredient_counts:
         name = ingredient['ingredient__name']
         amount = ingredient['total_amount']
