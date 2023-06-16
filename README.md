@@ -22,8 +22,18 @@
   - PyCharm 2023 1.2 (CE)
 
 
-### - Запуск:
+### - Первичный запуск:
 
-- Скачайте папку `infra` и `data` из корневой директории проекта.
+- Скачайте папки `infra` и `data` из корневой директории проекта.
 - Разместите эти папки на своем сервере.
-- 
+- В директории `infra` создайте файл `.env` \
+  со следующими данными:
+  - `HOST=<http://rbychin.ddns.net> адрес хоста`
+  - `DB_ENGINE=django.db.backends.postgresql`
+  - `DB_NAME=<Имя базы>`
+  - `POSTGRES_USER=<Имя пользователя>`
+  - `POSTGRES_PASSWORD=<Пароль базы>`
+  - `DB_HOST=infra_db_1`
+  - `DB_PORT=5432`
+
+- docker-compose exec backend bash
