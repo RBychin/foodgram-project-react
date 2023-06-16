@@ -150,7 +150,7 @@ DJOSER = {
 MAX_LENGTH = 100  # Длина имен
 
 AUTH_USER_MODEL = 'users.CustomUser'
-CSRF_TRUSTED_ORIGINS = ['http://*rbychin.ddns.net', 'http://*.127.0.0.1', 'http://localhost']
+CSRF_TRUSTED_ORIGINS = [f"http*{os.getenv('DB_HOST')}"]
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
