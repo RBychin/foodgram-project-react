@@ -41,7 +41,7 @@ class RecipeView(CustomModelViewSet):
 
     queryset = Recipe.objects.all()
     pagination_class = PageLimitPagination
-    permission_classes = [IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
+    permission_classes = [IsAuthenticatedOrReadOnly]
     filterset_class = RecipeFilter
     filter_backends = (DjangoFilterBackend,)
 
@@ -53,7 +53,8 @@ class RecipeView(CustomModelViewSet):
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
-    @action(methods=['POST', 'DELETE'], detail=True, url_path='favorite')
+    @action(methods=['POST', 'DELETE'], detail=True, url_path='favorite',
+            permission_classes=[IsAuthenticated])
     def favorite(self, request, *args, **kwargs):
         return self.manage_favorite_cart(Favorite)
 
