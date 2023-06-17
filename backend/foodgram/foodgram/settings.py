@@ -82,8 +82,6 @@ DATABASES = {
         'PORT': os.getenv('DB_PORT', ''),
     }
 }
-print(f"Data Base Engine is "
-      f"{'POSTGRES' if DATABASES.get('default').get('ENGINE') == 'django.db.backends.postgresql' else 'SQLITE'}")
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators

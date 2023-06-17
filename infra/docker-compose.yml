@@ -19,6 +19,8 @@ services:
       - db
     env_file:
       - ./.env
+    links:
+      - db
 
   frontend:
     image: rbychin/foodgram_frontend:latest
@@ -39,6 +41,8 @@ services:
       - static_value:/var/html/static/
       - media_value:/var/html/media/
     depends_on:
+      - backend
+    links:
       - backend
 
 volumes:
