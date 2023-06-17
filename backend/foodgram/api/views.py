@@ -63,7 +63,8 @@ class RecipeView(CustomModelViewSet):
     def shopping_cart(self, *args, **kwargs):
         return self.manage_favorite_cart(ShoppingCart)
 
-    @action(methods=['GET'], detail=False, url_path='download_shopping_cart')
+    @action(methods=['GET'], detail=False, url_path='download_shopping_cart',
+            permission_classes=[IsAuthenticated])
     def download_cart(self, *args, **kwargs):
         if not self.request.user.cart.all():
             raise ValidationError({'errors': 'Корзина пуста.'})
