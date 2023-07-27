@@ -66,7 +66,7 @@ jobs:
           script: |
             # Pull docker images from docker hub
             cd infra
-            docker-compose down
+            docker compose down
             docker rmi rbychin/foodgram_backend
             rm .env
             touch .env
@@ -77,4 +77,4 @@ jobs:
             echo POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} >> .env
             echo DB_HOST=${{ secrets.DB_HOST }} >> .env
             echo DB_PORT=${{ secrets.DB_PORT }} >> .env
-            docker-compose up -d
+            docker compose up -d
