@@ -2,7 +2,7 @@ version: '3.3'
 services:
 
   db:
-    image: postgres:13.4
+    image: postgres:13.4-alpine
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     env_file:
@@ -28,7 +28,7 @@ services:
       - db
 
   nginx:
-    image: nginx:1.19.3
+    image: nginx:1.19.3-alpine
     ports:
       - "80:80"
     volumes:
