@@ -3,15 +3,6 @@
 
 ![example workflow](https://github.com/RBychin/yamdb_final/actions/workflows/yamdb_workflow.yml/badge.svg)
 
-Для ревью:
-- Адрес сайта: \
-  http://rbychin.ddns.net
-- Admin name: \
-  `admin`
-- Admin password: \
-  `admin`
-- Users passwords: \
-  `Ghfrnbrev23` (`Практикум23`)
 
 ### - Описание проекта:
 - Foodgram - сайт, для обмена рецептами.
